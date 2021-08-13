@@ -17,35 +17,36 @@ Blazor Desktop and React Native Windows both look super-cool, but I'm required t
 ## Limitations
 
 * No automatic change detection; I think implementing a sort of virtual DOM - https://medium.com/@deathmood/how-to-write-your-own-virtual-dom-ee74acc13060 - could work here.
-* Code-generation is very primitive: just fancy string concatenation. I have yet to look at the System.CodeDom API in detail (I use it for formatting C# strings, but that's it), and I suspect it would help a lot.
-* Most properties on most built-in controls (`StackPanel` `Orientation`, etc) aren't supported, and properties for custom controls will require modifying the code generator... I think these are related problems, and am not 100% sure how to tackle them at the moment (though I have some early ideas).
+* Code-generation is very primitive: just string concatenation. I have yet to look at the `System.CodeDom` API in detail (I use it for formatting C# strings, but that's it), and I suspect it would help a lot.
+* Most properties on most built-in controls (`StackPanel` `Orientation`, etc) aren't supported, and properties for custom controls will require modifying the code generator. I think these are related problems, and am not 100% sure how to tackle them at the moment, though I have some early ideas.
 * No IDE support in view XML. Solving this would require writing a VS extension.
+* C# expressions in strings require `&quot;`, which just looks ugly :| Example: `<Button _click="DoToggle()" _text="ShowMore ? &quot;Less&quot; : &quot;More&quot;" />`
 
 ## Features
 
-* NOT MVVM; component-based/MVP-y. if you've used Blazor, Angular, or React, it will feel familiar to you. Component code-behind contains properties and methods which are easily accessible by its XML.
+* NOT MVVM; component-based/MVP-y. If you've used Blazor, Angular, or React, it will feel familiar to you. A component's code-behind contains properties and methods which are easily accessible by its XML.
 * DI is very easy to achieve; see `WpfNoXaml/Startup.cs` for application entry point, including config loading and DI setup using `Microsoft.Extensions.*`.
 
 ## Example
 
 This `MainWindow.xml`:
 
-```C#
+```xml
 <?Using System?>
 <?Using System.Linq?>
 
 <StackPanel>
-	<TextBlock text="Hi" />
+    <TextBlock text="Hi" />
 
-	<Button _click="DoToggle()" _text="ShowMore ? &quot;Less&quot; : &quot;More&quot;" />
+    <Button _click="DoToggle()" _text="ShowMore ? &quot;Less&quot; : &quot;More&quot;" />
     <StackPanel _if="ShowMore">
         <TextBlock _forEach="l in Labels" _text="l" />
-	</StackPanel>
+    </StackPanel>
 
-	<WrapPanel>
-		<Button _click="DoRollDie()" text="Roll Die" />
-		<TextBlock _text="DieRoll == 0 ? &quot;&quot; : DieRoll.ToString()" />
-	</WrapPanel>
+    <WrapPanel>
+        <Button _click="DoRollDie()" text="Roll Die" />
+        <TextBlock _text="DieRoll == 0 ? &quot;&quot; : DieRoll.ToString()" />
+    </WrapPanel>
 </StackPanel>
 ```
 
