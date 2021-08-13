@@ -1,0 +1,16 @@
+﻿<?Using System?>
+<?Using System.Linq?>
+
+<StackPanel>
+	<TextBlock text="Hi" />
+
+	<Button _click="DoToggle()" _text="ShowMore ? &quot;Less&quot; : &quot;More&quot;" />
+    <StackPanel _if="ShowMore">
+        <TextBlock _forEach="l in Labels" _text="l" />
+	</StackPanel>
+
+	<WrapPanel>
+		<Button _click="DoRollDie()" text="Roll Die" />
+		<TextBlock _text="DieRoll == 0 ? &quot;&quot; : DieRoll.ToString()" />
+	</WrapPanel>
+</StackPanel>
