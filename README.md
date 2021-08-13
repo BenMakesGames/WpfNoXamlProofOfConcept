@@ -29,7 +29,9 @@ Blazor Desktop and React Native Windows both look super-cool, but I'm required t
 
 ## Example
 
-This `MainWindow.xml`:
+![GIF of running demo](https://github.com/BenMakesGames/WpfNoXamlProofOfConcept/blob/main/no-xaml-demo.gif?raw=true)
+
+From this `MainWindow.xml`:
 
 ```xml
 <?Using System?>
@@ -50,7 +52,7 @@ This `MainWindow.xml`:
 </StackPanel>
 ```
 
-Gets compiled into this:
+Which got compiled into this:
 
 ```C#
 using NoXaml.Framework.Extensions.WPF;
