@@ -13,11 +13,5 @@ namespace NoXaml.Framework.Extensions.WPF
             
             return button;
         }
-
-        public static Button SetText(this Button button, string text)
-        {
-            button.Content = text;
-            return button;
-        }
     }
 }

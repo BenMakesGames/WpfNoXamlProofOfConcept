@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NoXaml.Framework.Components;
+using NoXaml.Framework.Services;
 
 namespace WpfNoXaml.Components
 {
@@ -18,25 +19,28 @@ namespace WpfNoXaml.Components
 
         public MainWindow(Random rng)
         {
+            // "Random" having been registered with Microsoft DI as a singleton service
             RNG = rng;
 
             Title = "NoXaml Demo";
             Width = 640;
             Height = 360;
 
-            BuildUI();
+            UIBuilder.UpdateUI(this);
         }
         
         public void DoToggle()
         {
             ShowMore = !ShowMore;
-            BuildUI();
+            
+            UIBuilder.UpdateUI(this);
         }
 
         public void DoRollDie()
         {
             DieRoll = RNG.Next(6) + 1;
-            BuildUI();
+            
+            UIBuilder.UpdateUI(this);
         }
     }
 }

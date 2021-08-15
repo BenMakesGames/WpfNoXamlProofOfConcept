@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Windows;
 
 namespace NoXaml.Framework.Extensions.WPF
@@ -18,6 +19,14 @@ namespace NoXaml.Framework.Extensions.WPF
         {
             foreach (var i in items)
                 method(element, i);
+
+            return element;
+        }
+
+        public static T SetProperty<T, U>(this T element, string propertyName, U value) where T: FrameworkElement
+        {
+            PropertyInfo property = element.GetType().GetProperty(propertyName);
+            property.SetValue(element, value);
 
             return element;
         }

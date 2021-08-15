@@ -1,7 +1,12 @@
-﻿namespace NoXaml.Interfaces.Components
+﻿using NoXaml.Model.DOM;
+
+namespace NoXaml.Model.Components
 {
     public interface INoXaml
     {
-        void BuildUI();
+        object Content { get; set; }
+        Element VDOM { get; set; }
+        
+        Element BuildVDOM();
     }
 }

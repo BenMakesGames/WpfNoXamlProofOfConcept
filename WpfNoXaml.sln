@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfNoXaml", "WpfNoXaml\WpfN
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoXaml.Compiler", "NoXaml.Compiler\NoXaml.Compiler.csproj", "{2E614915-5A20-432B-B594-1545C060D298}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoXaml.Framework", "NoXaml.Framework\NoXaml.Framework.csproj", "{909870A8-21ED-49B8-A3A1-6AF69C19C42D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoXaml.Framework", "NoXaml.Framework\NoXaml.Framework.csproj", "{909870A8-21ED-49B8-A3A1-6AF69C19C42D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoXaml.Interfaces", "NoXaml.Interfaces\NoXaml.Interfaces.csproj", "{7CFAFE93-E976-4D71-8FCF-FAA67603FCD6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoXaml.Model", "NoXaml.Interfaces\NoXaml.Model.csproj", "{7CFAFE93-E976-4D71-8FCF-FAA67603FCD6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

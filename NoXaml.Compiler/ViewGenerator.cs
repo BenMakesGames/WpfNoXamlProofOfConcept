@@ -91,7 +91,7 @@ namespace NoXaml.Compiler
 
             var implementedInterfaces = classSymbol.AllInterfaces;
 
-            return implementedInterfaces.Any(i => i.ToString() == "NoXaml.Interfaces.Components.INoXaml");
+            return implementedInterfaces.Any(i => i.ToString() == "NoXaml.Model.Components.INoXaml");
         }
 
         private string GenerateViewCode(ViewMeta view)
@@ -105,7 +105,7 @@ namespace NoXaml.Compiler
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFilePath);
 
-            var buildUICode = new StringBuilder();
+            var buildVDOMCode = new StringBuilder();
 
             var rootNodes = xmlDoc.ChildNodes.Cast<XmlNode>().ToList();
 
@@ -119,11 +119,13 @@ namespace NoXaml.Compiler
             if (rootNodes.FirstOrDefault(n => n is XmlElement) is not XmlElement root)
                 return null;
 
-            AddNode(root, buildUICode, 0);
+            AddNode(root, buildVDOMCode, "_0");
 
             string classCode = $@"
 using NoXaml.Framework.Extensions.WPF;
-using NoXaml.Interfaces.Components;
+using NoXaml.Model.Components;
+using NoXaml.Model.DOM;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 {usingStatements}
@@ -132,9 +134,10 @@ namespace {view.Namespace}
 {{
     public partial class {view.ClassName}: INoXaml
     {{
-        public override void BuildUI()
+        public override Element BuildVDOM()
         {{
-{buildUICode}
+{buildVDOMCode}
+            return _0;
         }}
     }}
 }}";
@@ -147,17 +150,13 @@ namespace {view.Namespace}
             return new string('\t', level + 3);
         }
 
-        private int nextVarIndex = 1;
-
-        private string GetTempVarName()
+        private readonly static string[] ReservedProperties = new[]
         {
-            var varName = $"_v{nextVarIndex}";
-            nextVarIndex++;
+            "_if",
+            "_foreach"
+        };
 
-            return varName;
-        }
-
-        private void AddNode(XmlElement node, StringBuilder code, int level)
+        private void AddNode(XmlElement node, StringBuilder code, string nodeVarName, int indentLevel = 0)
         {
             var nodeType = node.Name;
 
@@ -165,46 +164,80 @@ namespace {view.Namespace}
                 return;
 
             var attributes = node.Attributes.Cast<XmlAttribute>().ToList();
-            var depth = 1;
 
-            if (level == 0)
-                code.AppendLine($"{Indent(level)}Content = (new {nodeType}()");
-            else
+            code.AppendLine($"{Indent(indentLevel)}var {nodeVarName} = new Element(typeof({nodeType}));");
+
+            var componentProperties = attributes
+                .Where(a => !ReservedProperties.Contains(a.Name.ToLower()))
+                .ToList()
+            ;
+
+            if(componentProperties.Count > 0)
             {
-                if(GetForEach(attributes) is ForEachAttribute fe)
+                code.AppendLine($"{Indent(indentLevel)}{nodeVarName}.Properties = new Dictionary<string, object>()");
+                code.AppendLine($"{Indent(indentLevel)}{{");
+
+                foreach (var attr in componentProperties)
                 {
-                    var varName = GetTempVarName();
+                    var propertyName = attr.Name;
+                    var value = attr.Value;
 
-                    code.AppendLine($"{Indent(level)}.ForEach({fe.Collection}, ({varName}, {fe.ItemVariableName}) =>");
-                    code.AppendLine($"{Indent(level + 1)}{varName}.Add(new {nodeType}()");
+                    if (propertyName.StartsWith("_"))
+                    {
+                        propertyName = propertyName.Substring(1);
 
-                    depth++;
+                        if (propertyName.ToLower() == "click") // TODO: detect event properties
+                        {
+                            value = $"(RoutedEventHandler)((_sender, _args) => {value})";
+                        }
+                    }
+                    else
+                    {
+                        value = value.ToLiteral();
+                    }
+
+                    code.AppendLine($"{Indent(indentLevel + 1)}{{ {propertyName.ToLiteral()}, {value} }},");
                 }
-                else if(GetIf(attributes) is IfAttribute i)
-                {
-                    var varName = GetTempVarName();
 
-                    code.AppendLine($"{Indent(level)}.If({i.Condition}, {varName} =>");
-                    code.AppendLine($"{Indent(level + 1)}{varName}.Add(new {nodeType}()");
-
-                    depth++;
-                }
-                else
-                    code.AppendLine($"{Indent(level)}.Add(new {nodeType}()");
+                code.AppendLine($"{Indent(indentLevel)}}};");
             }
 
-            foreach (var attr in attributes)
-                AddAttribute(attr, code, level + depth);
-
             var children = node.ChildNodes.Cast<XmlNode>().Where(n => n is XmlElement).Cast<XmlElement>();
+            var childIndex = 1;
 
             foreach (var child in children)
-                AddNode(child, code, level + depth);
+            {
+                var childAttributes = child.Attributes.Cast<XmlAttribute>().ToList();
+                var childVarName = $"{nodeVarName}Child{childIndex}";
 
-            if (level == 0)
-                code.AppendLine($"{Indent(level)}{new string(')', depth)};");
-            else
-                code.AppendLine($"{Indent(level)}{new string(')', depth)}");
+                if (GetIf(childAttributes) is IfAttribute i)
+                {
+                    code.AppendLine($"{Indent(indentLevel)}if({i.Condition})");
+                    code.AppendLine($"{Indent(indentLevel)}{{");
+
+                    AddNode(child, code, childVarName, indentLevel + 1);
+
+                    code.AppendLine($"{Indent(indentLevel + 1)}{nodeVarName}.Children.Add({childVarName});");
+                    code.AppendLine($"{Indent(indentLevel)}}}");
+                }
+                else if (GetForEach(childAttributes) is ForEachAttribute fe)
+                {
+                    code.AppendLine($"{Indent(indentLevel)}{nodeVarName}.Children.AddRange({fe.Collection}.Select({fe.ItemVariableName} => {{");
+                    
+                    AddNode(child, code, childVarName + "ForEach", indentLevel + 1);
+                    
+                    code.AppendLine($"{Indent(indentLevel + 1)}return {childVarName}ForEach;");
+                    code.AppendLine($"{Indent(indentLevel)}}}));");
+                }
+                else
+                {
+                    AddNode(child, code, childVarName, indentLevel);
+
+                    code.AppendLine($"{Indent(0)}{nodeVarName}.Children.Add({childVarName});");
+                }
+
+                childIndex++;
+            }
         }
 
         private ForEachAttribute GetForEach(List<XmlAttribute> attrs)
@@ -237,22 +270,6 @@ namespace {view.Namespace}
             {
                 Condition = ifAttr.Value.Trim()
             };
-        }
-
-        private void AddAttribute(XmlAttribute attr, StringBuilder code, int level)
-        {
-            switch(attr.Name.ToLower())
-            {
-                case "_click":
-                    code.AppendLine($"{Indent(level)}.OnClick((_sender, _args) => {attr.Value})");
-                    break;
-                case "text":
-                    code.AppendLine($@"{Indent(level)}.SetText({attr.Value.ToLiteral()})");
-                    break;
-                case "_text":
-                    code.AppendLine($@"{Indent(level)}.SetText({attr.Value})");
-                    break;
-            }
         }
 
         private string GenerateUsingStatements(IEnumerable<XmlProcessingInstruction> processingInstructions)

@@ -2,15 +2,14 @@
 <?Using System.Linq?>
 
 <StackPanel>
-	<TextBlock text="Hi" />
+  <TextBlock Text="Hi" _FontSize="(DieRoll + 5) * 2" _TextAlignment="TextAlignment.Center" />
 
-	<Button _click="DoToggle()" _text="ShowMore ? &quot;Less&quot; : &quot;More&quot;" />
-    <StackPanel _if="ShowMore">
-        <TextBlock _forEach="l in Labels" _text="l" />
-	</StackPanel>
-
-	<WrapPanel>
-		<Button _click="DoRollDie()" text="Roll Die" />
-		<TextBlock _text="DieRoll == 0 ? &quot;&quot; : DieRoll.ToString()" />
-	</WrapPanel>
+  <Button _click="DoToggle()" _Content="ShowMore ? &quot;Less&quot; : &quot;More&quot;" />
+  <StackPanel _if="ShowMore">
+    <TextBlock _forEach="l in Labels" _Text="l" />
+  </StackPanel>
+  <WrapPanel>
+    <Button _click="DoRollDie()" Content="Roll Die" />
+    <TextBlock _Text="DieRoll == 0 ? &quot;&quot; : DieRoll.ToString()" />
+  </WrapPanel>
 </StackPanel>
