@@ -78,36 +78,36 @@ namespace WpfNoXaml.Components
             "Apples", "Oranges", "Pears", "Mangoes"
         };
 
+        // "Random" having been registered with Microsoft DI as a singleton service
         public MainWindow(Random rng)
         {
-            // "Random" having been registered with Microsoft DI as a singleton service
             RNG = rng;
 
             Title = "NoXaml Demo";
             Width = 640;
             Height = 360;
 
-            UIBuilder.UpdateUI(this); // TODO: remove this line after implementing chang-detection
+            UIBuilder.UpdateUI(this); // TODO: remove this line after implementing change-detection
         }
         
         public void DoToggle()
         {
             ShowMore = !ShowMore;
             
-            UIBuilder.UpdateUI(this); // TODO: remove this line after implementing chang-detection
+            UIBuilder.UpdateUI(this); // TODO: remove this line after implementing change-detection
         }
 
         public void DoRollDie()
         {
             DieRoll = RNG.Next(6) + 1;
             
-            UIBuilder.UpdateUI(this); // TODO: remove this line after implementing chang-detection
+            UIBuilder.UpdateUI(this); // TODO: remove this line after implementing change-detection
         }
     }
 }
 ```
 
-A C# Source Generator generates the following partial class from the view XML at compile-time. The `BuildVDOM` method it generates builds a virtual DOM, which is used by the framework to look for and apply changes to the view. Again: there are improvements that could be made to the efficient of this logic, and improvements to add automatic change detection.
+A C# Source Generator (https://github.com/BenMakesGames/WpfNoXamlProofOfConcept/blob/main/NoXaml.Compiler/ViewGenerator.cs) generates the following partial class from the view XML at compile-time. The `BuildVDOM` method it generates builds a virtual DOM, which is used by the framework to look for and apply changes to the view. Again: there are improvements that could be made to the efficiency of this logic, and improvements to add automatic change detection.
 
 ```C#
 using NoXaml.Framework.Extensions.WPF;
