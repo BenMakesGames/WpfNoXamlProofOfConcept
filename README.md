@@ -1,18 +1,20 @@
 ## What
 
-WpfNoXamlProofOfConcept uses C# Source Generation - https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/ - to create code-based WPF from a custom XML format.
+WpfNoXamlProofOfConcept uses [C# Source Generation](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) to create a kind of virtual DOM from a custom XML view format. This virtual DOM is used to render the UI, by building WPF components programatically. (There are code samples, and a GIF of the resulting application, below.)
 
-It follows a component-based paradigm more similar to Blazor, Angular, or React.
+It follows a component-based paradigm more similar to [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor), [Angular](https://angular.io/), or [React](https://reactjs.org/).
 
-The custom XML format allows inline `forEach` loops, `if` blocks, and C# expressions for labels and text values.
+The custom XML format allows inline `forEach` loops, `if` blocks, and C# expressions for property values. (Don't write a value converter when a simple ternary operator will do!)
 
-It's currently SUPER-limited, put together in less than 8 hours.
+It's currently SUPER-limited, put together in about 8 hours.
 
 ## Why
 
-Coming from a web fullstack background, I've been very disappointed with Windows desktop development. XAML is old, and clunky, and the MVVM implementation people use with it is ill-suited to dependency injection.
+Coming from a web fullstack background, I've been very disappointed with Windows desktop development. XAML is old, and clunky, and the MVVM implementation it forces is ill-suited to dependency injection.
 
-Blazor Desktop and React Native Windows both look super-cool, but I'm required to use WPF for my particular application, so those solutions aren't available to me. If _you_ can use Blazor Desktop or RNW, you probably should, instead of this.
+## Why Not
+
+You should not use WpfNoXamlProofOfConcept for a production application. Use [React Native for Windows](https://microsoft.github.io/react-native-windows/), instead.
 
 ## Features
 
@@ -124,50 +126,50 @@ namespace WpfNoXaml.Components
     {
         public override Element BuildVDOM()
         {
-			var _0 = new Element(typeof(StackPanel));
-			var _0Child1 = new Element(typeof(TextBlock));
-			_0Child1.Properties = new Dictionary<string, object>()
-			{
-				{ "Text", "Hi" },
-				{ "FontSize", (DieRoll + 5) * 2 },
-				{ "TextAlignment", TextAlignment.Center },
-			};
-			_0.Children.Add(_0Child1);
-			var _0Child2 = new Element(typeof(Button));
-			_0Child2.Properties = new Dictionary<string, object>()
-			{
-				{ "click", (RoutedEventHandler)((_sender, _args) => DoToggle()) },
-				{ "Content", ShowMore ? "Less" : "More" },
-			};
-			_0.Children.Add(_0Child2);
-			if(ShowMore)
-			{
-				var _0Child3 = new Element(typeof(StackPanel));
-				_0Child3.Children.AddRange(Labels.Select(l => {
-					var _0Child3Child1ForEach = new Element(typeof(TextBlock));
-					_0Child3Child1ForEach.Properties = new Dictionary<string, object>()
-					{
-						{ "Text", l },
-					};
-					return _0Child3Child1ForEach;
-				}));
-				_0.Children.Add(_0Child3);
-			}
-			var _0Child4 = new Element(typeof(WrapPanel));
-			var _0Child4Child1 = new Element(typeof(Button));
-			_0Child4Child1.Properties = new Dictionary<string, object>()
-			{
-				{ "click", (RoutedEventHandler)((_sender, _args) => DoRollDie()) },
-				{ "Content", "Roll Die" },
-			};
-			_0Child4.Children.Add(_0Child4Child1);
-			var _0Child4Child2 = new Element(typeof(TextBlock));
-			_0Child4Child2.Properties = new Dictionary<string, object>()
-			{
-				{ "Text", DieRoll == 0 ? "" : DieRoll.ToString() },
-			};
-			_0Child4.Children.Add(_0Child4Child2);
-			_0.Children.Add(_0Child4);
+            var _0 = new Element(typeof(StackPanel));
+            var _0Child1 = new Element(typeof(TextBlock));
+            _0Child1.Properties = new Dictionary<string, object>()
+            {
+                { "Text", "Hi" },
+                { "FontSize", (DieRoll + 5) * 2 },
+                { "TextAlignment", TextAlignment.Center },
+            };
+            _0.Children.Add(_0Child1);
+            var _0Child2 = new Element(typeof(Button));
+            _0Child2.Properties = new Dictionary<string, object>()
+            {
+                { "click", (RoutedEventHandler)((_sender, _args) => DoToggle()) },
+                { "Content", ShowMore ? "Less" : "More" },
+            };
+            _0.Children.Add(_0Child2);
+            if(ShowMore)
+            {
+                var _0Child3 = new Element(typeof(StackPanel));
+                _0Child3.Children.AddRange(Labels.Select(l => {
+                    var _0Child3Child1ForEach = new Element(typeof(TextBlock));
+                    _0Child3Child1ForEach.Properties = new Dictionary<string, object>()
+                    {
+                        { "Text", l },
+                    };
+                    return _0Child3Child1ForEach;
+                }));
+                _0.Children.Add(_0Child3);
+            }
+            var _0Child4 = new Element(typeof(WrapPanel));
+            var _0Child4Child1 = new Element(typeof(Button));
+            _0Child4Child1.Properties = new Dictionary<string, object>()
+            {
+                { "click", (RoutedEventHandler)((_sender, _args) => DoRollDie()) },
+                { "Content", "Roll Die" },
+            };
+            _0Child4.Children.Add(_0Child4Child1);
+            var _0Child4Child2 = new Element(typeof(TextBlock));
+            _0Child4Child2.Properties = new Dictionary<string, object>()
+            {
+                { "Text", DieRoll == 0 ? "" : DieRoll.ToString() },
+            };
+            _0Child4.Children.Add(_0Child4Child2);
+            _0.Children.Add(_0Child4);
 
             return _0;
         }
